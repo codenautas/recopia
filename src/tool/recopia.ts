@@ -22,6 +22,9 @@ export async function fsutimes<T extends string|number|Date|bigint>(path:string,
 }
 
 export async function copiar(src:string, dest:string, opts:any){
+    if(opts.verbose){
+        console.log(src)
+    }
     var entries = await fs.readdir(src);
     while(entries.length){
         var name = entries.shift()!;
@@ -48,7 +51,7 @@ export async function copiar(src:string, dest:string, opts:any){
             // console.log('xxxxxxx esta por copiar',deboCopiar,srcPath, destPath, srcStat.mtimeMs, (destStat||{}).mtimeMs);
             if(deboCopiar){
                 if(opts.verbose){
-                    console.log('copiando',srcPath, destPath)
+                    console.log('copiando',srcPath,'->', destPath);
                 }
                 await fs.copyFile(srcPath, destPath);
             }
