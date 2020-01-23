@@ -8,13 +8,19 @@
 
 import * as fs from 'fs-extra';
 import * as discrepances from "discrepances";
-import { copiar } from "../..";
+import { copiar, fsstat, fsutimes } from "../..";
 // import * as Path from 'path';
 
 async function compareFiles(expectedFileName:string, obtainedFileName:string){
     var expected = await fs.readFile(expectedFileName,'utf8');
     var obtained = await fs.readFile(obtainedFileName,'utf8');
     discrepances.showAndThrow(obtained, expected);
+}
+
+async function compareFilesInfo(expectedFileName:string, obtainedFileName:string){
+    var expected = await fsstat(expectedFileName);
+    var obtained = await fsstat(obtainedFileName);
+    discrepances.showAndThrow(obtained.mtime, expected.mtime);
 }
 
 // var PATH='src/test/fixtures';
@@ -25,6 +31,17 @@ describe('recopia', function(){
         await fs.ensureDir(`work/the-local`); 
         await copiar(`src/test/fixtures/inicial-local`, `work/the-local`, {});
         await compareFiles(`src/test/fixtures/inicial-local/archivo3.txt`,`work/the-local/archivo3.txt`);
+        await compareFilesInfo(`src/test/fixtures/inicial-local/archivo3.txt`,`work/the-local/archivo3.txt`);
+    });
+    it('copies subarchivo1.txt from servidor to the-local', async function(){
+        var statArchivo1 = await fsstat(`src/test/fixtures/inicial-local/archivo1.txt`);
+        await fsutimes(`work/the-local/archivo1.txt`,statArchivo1.atime,statArchivo1.mtime);
+        await fsutimes(`src/test/fixtures/inicial-servidor/archivo1.txt`,statArchivo1.atime,statArchivo1.mtime);
+        await copiar(`src/test/fixtures/inicial-servidor`, `work/the-local`, {});
+        await compareFiles(`src/test/fixtures/inicial-servidor/subcarpeta/sub-archivo1.txt`,`work/the-local/subcarpeta/sub-archivo1.txt`);
+        await compareFilesInfo(`src/test/fixtures/inicial-servidor/subcarpeta/sub-archivo1.txt`,`work/the-local/subcarpeta/sub-archivo1.txt`);
+        var content = await fs.readFile(`work/the-local/archivo1.txt`, 'utf8');
+        discrepances.showAndThrow(content, 'otra cosa!');
     });
 });
 
