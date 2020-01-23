@@ -37,7 +37,7 @@ export async function copiar(src:string, dest:string, opts:any){
             var deboCopiar = null;
             try{
                 var destStat=await fsstat(destPath);
-                deboCopiar = srcStat.mtimeMs != destStat.mtimeMs;
+                deboCopiar = srcStat.mtimeMs != destStat.mtimeMs || srcStat.size != destStat.size;
             }catch(err){
                 if(err.code=='ENOENT'){
                     deboCopiar = true;
@@ -47,8 +47,10 @@ export async function copiar(src:string, dest:string, opts:any){
             }
             // console.log('xxxxxxx esta por copiar',deboCopiar,srcPath, destPath, srcStat.mtimeMs, (destStat||{}).mtimeMs);
             if(deboCopiar){
+                if(opts.verbose){
+                    console.log('copiando',srcPath, destPath)
+                }
                 await fs.copyFile(srcPath, destPath);
-                // await fs.utimes(destPath,srcStat.mtime)
             }
         }
     }

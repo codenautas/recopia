@@ -37,11 +37,19 @@ describe('recopia', function(){
         var statArchivo1 = await fsstat(`src/test/fixtures/inicial-local/archivo1.txt`);
         await fsutimes(`work/the-local/archivo1.txt`,statArchivo1.atime,statArchivo1.mtime);
         await fsutimes(`src/test/fixtures/inicial-servidor/archivo1.txt`,statArchivo1.atime,statArchivo1.mtime);
+        await fsutimes(`work/the-local/archivo4.txt`,statArchivo1.atime,statArchivo1.mtime);
+        await fsutimes(`src/test/fixtures/inicial-servidor/archivo4.txt`,statArchivo1.atime,statArchivo1.mtime);
         await copiar(`src/test/fixtures/inicial-servidor`, `work/the-local`, {});
         await compareFiles(`src/test/fixtures/inicial-servidor/subcarpeta/sub-archivo1.txt`,`work/the-local/subcarpeta/sub-archivo1.txt`);
         await compareFilesInfo(`src/test/fixtures/inicial-servidor/subcarpeta/sub-archivo1.txt`,`work/the-local/subcarpeta/sub-archivo1.txt`);
+    });
+    it('skips when is the same datetime', async function(){
         var content = await fs.readFile(`work/the-local/archivo1.txt`, 'utf8');
         discrepances.showAndThrow(content, 'otra cosa!');
+    });
+    it('does not skips when is the same datetime but different sizes', async function(){
+        var content = await fs.readFile(`work/the-local/archivo4.txt`, 'utf8');
+        discrepances.showAndThrow(content, 'contenido4');
     });
 });
 
