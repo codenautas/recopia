@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "outDir": "../../dist/tool",
+        "module": "none"
+    },
+    "include":[
+        "."
+    ], 
+    "extends": "../../tsconfig-common.json"
+}

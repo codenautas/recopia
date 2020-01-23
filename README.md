@@ -1,2 +1,6 @@
 # recopia
-Copias incrementales
+Copia incremental
+
+## license
+   * MIT
+
